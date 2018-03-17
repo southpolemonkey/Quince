@@ -117,7 +117,7 @@ def main():
 
         ## EMA trading for Goldman Sachs
         if data['type'] == 'book' and data['symbol'] == 'GS':
-            print(data)
+            # print(data)
             try:
                 gs_last_sell = data['sell']
                 # gs_last_buy = date['buy']
