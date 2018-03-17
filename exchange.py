@@ -9,6 +9,14 @@ class Exchange:
         else:
             host_name = "production"
 
+        # This setting changes which test exchange is connected to.
+        # 0 is prod-like
+        # 1 is slower
+        # 2 is empty
+        test_exchange_index=1
+
+        port=port + (test_exchange_index if test else 0)
+
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((host_name, port))
         self.stream = s.makefile('rw', 1)
