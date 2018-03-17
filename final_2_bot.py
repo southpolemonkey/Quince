@@ -123,6 +123,7 @@ def main():
                 # gs_last_buy = date['buy']
                 # gs_new = (gs_last_buy + gs_last_sell) / 2
                 mean_average = ema(0.2, gs_last_sell, last)
+                print('mean average'.format(mean_average))
             except:
                 pass
             try:
@@ -130,7 +131,9 @@ def main():
                     gs_count += 1
                 else:
                     gs_count = 0
+                print('count'.format(count))
                 diff = last - gs_new
+                print('diff'.format(diff))
                 if gs_count >= 5:
                     # if diff < 0:
                     put_order(exchange, 'GS', 'BUY', gs_last_sell[0][0])
