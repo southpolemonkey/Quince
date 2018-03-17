@@ -126,12 +126,9 @@ def main():
                 if gs_count > 5:
                     put_order(exchange, 'GS', 'BUY', gs_last_sell[0][0])
                     put_order(exchange, 'GS', 'SELL', gs_last_buy[0][0])
-
+            except:
+                pass
             last = ema(0.2, gs_new, gs_last)
-
-
-
-
 
 
 if __name__ == "__main__":
