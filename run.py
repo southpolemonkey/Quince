@@ -10,9 +10,9 @@ from bot import Bot
 
 def main(strategies, test):
     exchange = Exchange(test)
-    print "Connected to exchange"
+    print("Connected to exchange")
     bot = Bot(exchange, strategies)
-    print "Bot initialized"
+    print("Bot initialized")
     bot.run()
 
 
@@ -30,5 +30,5 @@ if __name__ == '__main__':
             if serr.errno != errno.ECONNREFUSED:
                 raise serr
             # TODO metrics for each round
-            print "Sleeping..."
+            print("Sleeping...")
             time.sleep(1)
