@@ -1,57 +1,22 @@
-#!/usr/bin/python
-
-# ~~~~~==============   HOW TO RUN   ==============~~~~~
-# chmod +x bot.py
-# while true; do ./bot.py; sleep 1; done
-
-from __future__ import print_function
-
-import sys
-import socket
-import json
-
-# ~~~~~============== CONFIGURATION  ==============~~~~~
-# replace REPLACEME with your team name!
-team_name="QUINCE"
-# This variable dictates whether or not the bot is connecting to the prod
-# or test exchange. Be careful with this switch!
-test_mode = True
-
-# This setting changes which test exchange is connected to.
-# 0 is prod-like
-# 1 is slower
-# 2 is empty
-test_exchange_index=1
-prod_exchange_hostname="production"
-
-port=25000 + (test_exchange_index if test_mode else 0)
-exchange_hostname = "test-exch-" + team_name if test_mode else prod_exchange_hostname
-
-# ~~~~~============== NETWORKING CODE ==============~~~~~
-def connect():
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((exchange_hostname, port))
-    return s.makefile('rw', 1)
-
-def write_to_exchange(exchange, obj):
-    json.dump(obj, exchange)
-    exchange.write("\n")
-
-def read_from_exchange(exchange):
-    return json.loads(exchange.readline())
+def import_module(module_name):
+    """Helper function to import module"""
+    import sys
+    import os.path as osp
+    import importlib
+    sys.path.append(osp.join(osp.dirname(__file__), 'strategies'))
+    return importlib.import_module(module_name)
 
 
-# ~~~~~============== MAIN LOOP ==============~~~~~
+class Bot:
+    def __init__(self, exchange, strategies):
+        self.exchange = exchange
+        self.strategies = [import_module(strategy) for strategy in strategies]
 
-def main():
-    exchange = connect()
-    write_to_exchange(exchange, {"type": "hello", "team": team_name.upper()})
-    hello_from_exchange = read_from_exchange(exchange)
-    # A common mistake people make is to call write_to_exchange() > 1
-    # time for every read_from_exchange() response.
-    # Since many write messages generate marketdata, this will cause an
-    # exponential explosion in pending messages. Please, don't do that!
-    print("The exchange replied:", hello_from_exchange, file=sys.stderr)
-
-if __name__ == "__main__":
-    main()
+    def run(self):
+        data = self.exchange.read()
+        while data:
+            trades = []
+            for strategy in self.strategies:
+                trades.extend(strategy.trade(self.exchange))
+            self.exchange.trade_batch(trades)
+            data = self.exchange.read()
