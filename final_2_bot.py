@@ -64,9 +64,12 @@ def main():
     write_to_exchange(exchange, {"type": "hello", "team": team_name.upper()})
     hello_from_exchange = read_from_exchange(exchange)
     print("The exchange replied:", hello_from_exchange, file=sys.stderr)
+
+    ##### pair trading parameter #####
     vale_last_buy, vale_last_sell, valbz_last_buy, valbz_last_sell = \
         [None, None], [None, None ], [None, None], [None, None]
 
+    ##### ema parameter ######
     gs_last_buy, gs_last_sell = [None, None], [None, None]
     gs_last = None
     alpha = 0.3
@@ -116,6 +119,7 @@ def main():
                 gs_last_sell = data['sell']
                 gs_last_buy = date['buy']
                 gs_new = (gs_last_buy + gs_last_sell) / 2
+                last = ema(0.2, gs_new, gs_last)
             except:
                 pass
             try:
@@ -128,7 +132,6 @@ def main():
                     put_order(exchange, 'GS', 'SELL', gs_last_buy[0][0])
             except:
                 pass
-            last = ema(0.2, gs_new, gs_last)
 
 
 if __name__ == "__main__":
