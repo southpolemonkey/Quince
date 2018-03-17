@@ -71,11 +71,13 @@ def main():
     gs_last = None
     alpha = 0.3
     gs_count = 0
+    diff = 0.1
 
     for i in range(20000):
         data = read_from_exchange(exchange)
         if data['type'] == 'ack' or data['type'] == 'reject':
             print(data)
+        '''
         ## pair trading 
         if data['type'] == 'book' and data['symbol'] == 'VALE':
             try:
@@ -109,13 +111,14 @@ def main():
             for j in data['buy']:
                 if j[0] >= 1000:
                     put_order(exchange, 'BOND', 'SELL', j[0], j[1])
-
+        '''
         ## EMA trading for Goldman Sachs
         if data['type'] == 'book' and data['symbol'] == 'GS':
             try:
                 gs_last_sell = data['sell']
                 gs_last_buy = date['buy']
                 gs_new = (gs_last_buy + gs_last_sell) / 2
+                last = ema(0.3,gs_new,gs_last)
             except:
                 pass
             try:
@@ -123,12 +126,17 @@ def main():
                     gs_count += 1
                 else:
                     gs_count = 0
-                if gs_count > 5:
-                    put_order(exchange, 'GS', 'BUY', gs_last_sell[0][0])
-                    put_order(exchange, 'GS', 'SELL', gs_last_buy[0][0])
+                diff = last - gs_new
+                if gs_count >= 5:
+                    if diff > 0:
+                        put_order(exchange, 'GS', 'BUY', gs_last_sell[0][0])
+                    else:
+                        put_order(exchange, 'GS', 'SELL', gs_last_buy[0][0])
+                    #put_order(exchange, 'GS', 'BUY', gs_last_sell[0][0])
+                    #put_order(exchange, 'GS', 'SELL', gs_last_buy[0][0])
             except:
                 pass
-            last = ema(0.2, gs_new, gs_last)
+            #last = ema(0.2, gs_new, gs_last)
 
 
 if __name__ == "__main__":
