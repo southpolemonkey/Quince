@@ -32,8 +32,8 @@ def trade(exchange):
                 # TODO handle case where we hit buy/hold limit
                 # TODO order quantity based on difference (multiple of std?)
                 if price > sma + n * var:
-		    print sma
-		    print var
+                    print(sma)
+                    print(var)
                     trades.append(('SELL', symbol, price, size))
                 else:
                     break
@@ -42,8 +42,8 @@ def trade(exchange):
                 # TODO handle case where we hit buy/hold limit
                 # TODO order quantity based on difference (multiple of std?)
                 if price < sma - n * var:
-		    print sma
-		    print var
+                    print(sma)
+                    print(var)
                     trades.append(('BUY', symbol, price, size))
                 else:
                     break
