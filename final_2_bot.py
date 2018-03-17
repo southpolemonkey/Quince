@@ -16,7 +16,7 @@ from random import randint
 team_name="Quince"
 # This variable dictates whether or not the bot is connecting to the prod
 # or test exchange. Be careful with this switch!
-test_mode = False 
+test_mode = True 
 
 # This setting changes which test exchange is connected to.
 # 0 is prod-like
@@ -50,6 +50,12 @@ def put_order(exchange, symb, dir, price, size):
                      "size": size})
     print('order sent!')
 
+def ema(alpha, new, last=None):
+    if last == None:
+        return new
+    else:
+        return alpha * new + (1 - alpha) * last
+
 
 # ~~~~~============== MAIN LOOP ==============~~~~~
 
@@ -59,11 +65,18 @@ def main():
     hello_from_exchange = read_from_exchange(exchange)
     print("The exchange replied:", hello_from_exchange, file=sys.stderr)
     vale_last_buy, vale_last_sell, valbz_last_buy, valbz_last_sell = \
-        [None, None], [None, None ], [None, None], [None, None] 
+        [None, None], [None, None ], [None, None], [None, None]
+
+    gs_last_buy, gs_last_sell = [None, None], [None, None]
+    gs_last = None
+    alpha = 0.3
+    gs_count = 0
+
     for i in range(20000):
         data = read_from_exchange(exchange)
         if data['type'] == 'ack' or data['type'] == 'reject':
             print(data)
+        ## pair trading 
         if data['type'] == 'book' and data['symbol'] == 'VALE':
             try:
                 vale_last_sell = data['sell']
@@ -88,6 +101,7 @@ def main():
                     put_order(exchange, 'VALBZ', 'SELL', vale_last_buy[0][0], vale_last_buy[0][1])
             except:
                     pass
+        ## trading bond
         if data['type'] == 'book' and data['symbol'] == 'BOND':
             for j in data['sell']:
                 if j[0] <= 1000:
@@ -95,10 +109,29 @@ def main():
             for j in data['buy']:
                 if j[0] >= 1000:
                     put_order(exchange, 'BOND', 'SELL', j[0], j[1])
-    # A common mistake people make is to call write_to_exchange() > 1
-    # time for every read_from_exchange() response.
-    # Since many write messages generate marketdata, this will cause an
-    # exponential explosion in pending messages. Please, don't do that!
+
+        ## EMA trading for Goldman Sachs
+        if data['type'] == 'book' and data['symbol'] == 'GS':
+            try:
+                gs_last_sell = data['sell']
+                gs_last_buy = date['buy']
+                gs_new = (gs_last_buy + gs_last_sell) / 2
+            except:
+                pass
+            try:
+                if diff * (last - gs_new) > 0:
+                    gs_count += 1
+                else:
+                    gs_count = 0
+                if gs_count > 5:
+                    put_order(exchange, 'GS', 'BUY', gs_last_sell[0][0])
+                    put_order(exchange, 'GS', 'SELL', gs_last_buy[0][0])
+
+            last = ema(0.2, gs_new, gs_last)
+
+
+
+
 
 
 if __name__ == "__main__":
