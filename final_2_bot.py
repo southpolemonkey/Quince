@@ -81,42 +81,43 @@ def main():
         if data['type'] == 'ack' or data['type'] == 'reject':
             print(data)
         
-        ## pair trading 
-        if data['type'] == 'book' and data['symbol'] == 'VALE':
-            try:
-                vale_last_sell = data['sell']
-                vale_last_buy = data['buy']
-            except:
-                pass
-        if data['type'] == 'book' and data['symbol'] == 'VALBZ':
-            try:
-                valbz_last_sell = data['sell']
-                valbz_last_buy = data['buy']
-            except:
-                pass
-            try:
-                if vale_last_buy[0][0] >= valbz_last_sell[0][0]:
-                    put_order(exchange, 'VALBZ', 'BUY', valbz_last_sell[0][0], vale_last_sell[0][1])
-                    put_order(exchange, 'VALE', 'SELL', vale_last_buy[0][0], vale_last_sell[0][1])
-            except:
-                    pass
-            try:
-                if vale_last_sell[0][0] <= valbz_last_buy[0][0]:
-                    put_order(exchange, 'VALE', 'BUY', valbz_last_sell[0][0], vale_last_buy[0][1])
-                    put_order(exchange, 'VALBZ', 'SELL', vale_last_buy[0][0], vale_last_buy[0][1])
-            except:
-                    pass
-        ## trading bond
-        if data['type'] == 'book' and data['symbol'] == 'BOND':
-            for j in data['sell']:
-                if j[0] <= 1000:
-                    put_order(exchange, 'BOND', 'BUY', j[0], j[1])
-            for j in data['buy']:
-                if j[0] >= 1000:
-                    put_order(exchange, 'BOND', 'SELL', j[0], j[1])
+        # ## pair trading 
+        # if data['type'] == 'book' and data['symbol'] == 'VALE':
+        #     try:
+        #         vale_last_sell = data['sell']
+        #         vale_last_buy = data['buy']
+        #     except:
+        #         pass
+        # if data['type'] == 'book' and data['symbol'] == 'VALBZ':
+        #     try:
+        #         valbz_last_sell = data['sell']
+        #         valbz_last_buy = data['buy']
+        #     except:
+        #         pass
+        #     try:
+        #         if vale_last_buy[0][0] >= valbz_last_sell[0][0]:
+        #             put_order(exchange, 'VALBZ', 'BUY', valbz_last_sell[0][0], vale_last_sell[0][1])
+        #             put_order(exchange, 'VALE', 'SELL', vale_last_buy[0][0], vale_last_sell[0][1])
+        #     except:
+        #             pass
+        #     try:
+        #         if vale_last_sell[0][0] <= valbz_last_buy[0][0]:
+        #             put_order(exchange, 'VALE', 'BUY', valbz_last_sell[0][0], vale_last_buy[0][1])
+        #             put_order(exchange, 'VALBZ', 'SELL', vale_last_buy[0][0], vale_last_buy[0][1])
+        #     except:
+        #             pass
+        # ## trading bond
+        # if data['type'] == 'book' and data['symbol'] == 'BOND':
+        #     for j in data['sell']:
+        #         if j[0] <= 1000:
+        #             put_order(exchange, 'BOND', 'BUY', j[0], j[1])
+        #     for j in data['buy']:
+        #         if j[0] >= 1000:
+        #             put_order(exchange, 'BOND', 'SELL', j[0], j[1])
 
         ## EMA trading for Goldman Sachs
         if data['type'] == 'book' and data['symbol'] == 'GS':
+            print(data)
             try:
                 gs_last_sell = data['sell']
                 # gs_last_buy = date['buy']
