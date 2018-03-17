@@ -119,22 +119,22 @@ def main():
         if data['type'] == 'book' and data['symbol'] == 'GS':
             try:
                 gs_last_sell = data['sell']
-                gs_last_buy = date['buy']
-                gs_new = (gs_last_buy + gs_last_sell) / 2
-                last = ema(0.2, gs_new, gs_last)
+                # gs_last_buy = date['buy']
+                # gs_new = (gs_last_buy + gs_last_sell) / 2
+                mean_average = ema(0.2, gs_last_sell, last)
             except:
                 pass
             try:
-                if diff * (last - gs_new) > 0:
+                if diff * (mean_average - gs_last_sell) > 0:
                     gs_count += 1
                 else:
                     gs_count = 0
                 diff = last - gs_new
                 if gs_count >= 5:
-                    if diff > 0:
-                        put_order(exchange, 'GS', 'BUY', gs_last_sell[0][0])
-                    else:
-                        put_order(exchange, 'GS', 'SELL', gs_last_buy[0][0])
+                    # if diff < 0:
+                    put_order(exchange, 'GS', 'BUY', gs_last_sell[0][0])
+                    # else:
+                    #     put_order(exchange, 'GS', 'SELL', gs_last_buy[0][0])
             except:
                 pass
 
